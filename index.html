@@ -1,19 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Merry Christmas</title>
-    <link rel="stylesheet" href="./style.css">
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-  </head>
-  <body>
-        <div class="container">
-            <div class="column">
-                <h1>Merry Christmas Riko!</h1>
-                <img src="./penguin.png" alt="Penguins Celebrating Christmas">
+<html>
+<head>
+    <script>
+        function updateImage() {
+            var text = document.getElementById("input").value;
+            var enableFunSliders = document.getElementById("enable").checked;
+            if(!enableFunSliders){
+                document.getElementById("sliderDynamic").style.display="none";
+                document.getElementById("sliderR").style.display="none";
+                document.getElementById("sliderG").style.display="none";
+                document.getElementById("sliderB").style.display="none";
+            }
+            else{
+                document.getElementById("sliderDynamic").style.display="block";
+                document.getElementById("sliderR").style.display="block";
+                document.getElementById("sliderG").style.display="block";
+                document.getElementById("sliderB").style.display="block";
+
+            }
+            if(text=="" || text==null){
+                var canvas = document.getElementById("canvas");
+                var ctx = canvas.getContext("2d");
+                canvas.width=30;
+                canvas.height=30;
+                ctx.fillStyle = "black";
+                ctx.fillRect(1, 1, 30, 30);
+                return;
+            }
+            var sliderD = parseInt(document.getElementById("sliderDynamic").value);
+            var sliderR = parseInt(document.getElementById("sliderR").value);
+            var sliderG = parseInt(document.getElementById("sliderG").value);
+            var sliderB = parseInt(document.getElementById("sliderB").value);
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            
+            // Disable image smoothing for sharp edges
+            ctx.imageSmoothingEnabled = false;
+            
+            // Determine the size of the canvas
+            var numPixels = Math.ceil(text.length / 3);
+            var size = Math.ceil(Math.sqrt(numPixels));
+            var scale = 30; // Scale factor for larger view of pixels
+
+            canvas.width = size * scale;
+            canvas.height = size * scale;
+
+
+            // Reset canvas
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Process each set of 3 characters as one RGB value
+            for (let i = 0; i < text.length; i += 3) {
+                var r = text.charCodeAt(i) || 0;
+                if(enableFunSliders) r = r<sliderD ? r : Math.min(255,r+sliderR);
+                var g = (i + 1 < text.length ? text.charCodeAt(i + 1) : 0);
+                if(enableFunSliders) g = g<sliderD ? g : Math.min(255,g+sliderG);
+                var b = (i + 2 < text.length ? text.charCodeAt(i + 2) : 0);
+                if(enableFunSliders) b = b<sliderD ? b : Math.min(255,b+sliderB);
+                var x = (i / 3) % size;
+                var y = Math.floor((i / 3) / size);
+
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.fillRect(x*scale, y*scale, scale, scale);
+            }
+        }
+        window.onload = function() {
+            updateImage();
+        };
+    </script>
+</head>
+<body style="background-color: navy;">
+    <div style="display:flex;width:100vw;height:100vh;justify-content: center;align-items: center;">
+        <div style="display:flex;flex-direction: column;justify-content: center;gap:1rem;text-align: center;">
+            <label style="color:white;">Text to image!</label>
+            <input id="input" type="text" oninput="updateImage()"/>
+            <div style="display:flex; justify-content: center; gap:1rem;">
+                <input id="enable" type="checkbox" onchange="updateImage()">
+                <label style="color:white;">Enable fun sliders</label>
             </div>
+            <input id="sliderDynamic" type="range" min="31" max="128" value="100" oninput="updateImage()"/>
+            <input id="sliderR" type="range" min="0" max="100" value="0" oninput="updateImage()"/>
+            <input id="sliderG" type="range" min="0" max="100" value="0" oninput="updateImage()"/>
+            <input id="sliderB" type="range" min="0" max="100" value="0" oninput="updateImage()"/>
+            <canvas id="canvas" width="64" height="64" style="border:1px solid white;"></canvas>
         </div>
-  </body>
+    </div>
+</body>
 </html>
